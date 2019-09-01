@@ -1,0 +1,43 @@
+# sudo: required
+# cache:
+#   directories:
+#   # We cache the SDK so we don't have to download it again on subsequent builds.
+#   - $HOME/google-cloud-sdk
+# services:
+#   - docker
+# env:
+#   global:
+#     - GIT_SHA=$(git rev-parse HEAD)
+#     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+# before_install:
+#  # - openssl travis encrypted file setting-account GCP
+#   - if [ ! -d $HOME/google-cloud-sdk/bin ]; then
+#     # The install script errors if this directory already exists,
+#     # but Travis already creates it when we mark it as cached.
+#     rm -rf $HOME/google-cloud-sdk;
+#     # The install script is overly verbose, which sometimes causes
+#     # problems on Travis, so ignore stdout.
+#     curl https://sdk.cloud.google.com | bash > /dev/null;
+#   fi
+#   # This line is critical. We setup the SDK to take precedence in our
+#   # environment over the old SDK that is already on the machine
+#   - source $HOME/google-cloud-sdk/path.bash.inc
+#   - gcloud components update kubectl
+#   - gcloud auth activate-service-account --key-file service-account.json
+#   - gcloud version
+#   # Insert your own install + script below.
+#   - gcloud config set project XXXXX
+#   # id name of the google project e.g skilful-bern-217833987
+#   - gcloud config set compute/zone XXXXX
+#   # set the good zone
+#   - gcloud container clusters get-credentials multi-cluster
+#   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#   - docker build -t zencles/react-test -f ./client/Dockerfile.dev ./client
+# script:
+#   - docker run -e CI=true zencles/react-test npm run test
+
+# deploy:
+#   provider: script
+#   script: bash ./deploy.sh
+#   on:
+#     branch: master
